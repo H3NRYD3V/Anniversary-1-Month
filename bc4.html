@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Challenge #4</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0D0D0D;
+      --panel:#1b1b1b;
+      --pink:#FF4D88;
+      --muted:#F2CFCF;
+      --locked:#EFAFBD;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);font-family:"Raleway",system-ui,Segoe UI,Roboto,Arial;color:var(--muted)}
+    .stage{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 24px;position:relative}
+
+    h1.title{
+      font-family:"Cinzel Decorative",serif;
+      font-size:70px;
+      margin:50px 0 24px;
+      color:var(--pink);
+      text-shadow: 13px 10px 4px rgba(255,30,86,0.25);
+    }
+
+    .icon { position:absolute; font-size:120px; color: #ff3737; opacity:0.9; filter: drop-shadow(0 6px 12px rgba(0,0,0,0.6)); }
+    .icon.left-top { top:50px; left:50px }
+    .icon.right-top { top:50px; right:50px }
+
+    /* panel */
+    .panel {
+      width:900px; max-width:94%; border-radius:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); box-shadow: 0 40px 120px rgba(0,0,0,0.65), 0 12px 40px rgba(0,0,0,0.6);
+      position:relative; transition: box-shadow .22s ease, transform .18s ease; margin-top:50px;
+      overflow:hidden; padding-top: 44px; padding-bottom: 30px; padding-left: 54px; padding-right: 54px;
+    }
+    .panel::before{ content:''; position:absolute; inset:-8px; border-radius:16px;
+      background: radial-gradient(closest-side, rgba(255,130,171,0.02), transparent 40%); filter: blur(20px); z-index:0; pointer-events:none;
+    }
+    .panel-inner{ position:relative; z-index:2; text-align:center; min-height:180px; }
+
+    /* two states inside panel */
+    .summary, .detail{
+      transition: opacity .24s ease, transform .24s ease, visibility .24s;
+      will-change: opacity, transform;
+    }
+
+    /* summary content *
+
+
+    /* default: show summary, hide detail */
+    /* mặc định: chỉ thấy detail (câu hỏi), ẩn summary (2 nút) */
+/* mặc định: chỉ thấy detail (câu hỏi), ẩn summary (2 nút) */
+    .detail{ 
+    opacity:1; 
+    visibility:visible; 
+    transform:translateY(0); 
+    }
+    .summary{ 
+    opacity:0; 
+    visibility:hidden; 
+    transform:translateY(12px); 
+    position:absolute; 
+    inset:0; 
+    display:flex; 
+    flex-direction:column; 
+    justify-content:center; 
+    align-items:center;
+    }
+
+    /* khi hover: hiện summary, ẩn detail */
+    .panel:hover .summary,
+    .panel:focus-within .summary {
+    opacity:1; 
+    visibility:visible; 
+    transform:translateY(0);
+    }
+    .panel:hover .detail,
+    .panel:focus-within .detail {
+    opacity:0; 
+    visibility:hidden; 
+    transform:translateY(-12px);
+    }
+
+    /* summary content (matches image 1) */
+        .summary h2{ 
+    margin:0 0 26px; 
+    font-size:26px;   /* giống .detail .bigtext */
+    color:var(--muted); 
+    font-weight:600; 
+    }
+
+    .choices{ 
+    display:flex; 
+    gap:50px; 
+    justify-content:center; 
+    align-items:center; 
+    margin:10px 0 26px; 
+    flex-wrap:wrap; 
+    }
+
+    .choice{
+    min-width:220px; 
+    max-width:300px; 
+    height:70px; 
+    background: #161616; 
+    border-radius:8px; 
+    padding:50px 60px;
+    color:var(--muted); 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    font-size:24px;   /* tăng giống detail text */
+    font-weight:600;
+    box-shadow: 0 18px 60px rgba(0,0,0,0.6), 0 0 42px rgba(0,0,0,0.35) inset; 
+    transition: transform .14s, box-shadow .14s; 
+    cursor:pointer;
+    position:relative;
+    line-height:1.6;  /* đồng bộ spacing */
+    }
+    .choice::before{ content:''; position:absolute; left:-12px; right:-12px; top:-12px; bottom:-12px; border-radius:14px;
+      background: radial-gradient(closest-side, rgba(255,255,255,0.04), rgba(255,255,255,0.01) 45%, transparent 60%); filter: blur(8px); z-index:-1; pointer-events:none;
+    }
+    .choice:hover{ transform:translateY(-8px); background:#161616; box-shadow:0 30px 90px rgba(0,0,0,0.7), 0 0 36px rgba(255,80,140,0.06); }
+
+    .note{ font-size: 22px;margin-top:18px; font-style:italic; color:rgba(242,207,207,0.9); line-height:1.6; }
+
+    /* detail state (matches image 2) */
+    .detail .bigtext{ font-size:26px; color:var(--muted); line-height:1.6; margin-bottom:18px; font-weight:600; padding-left: 15px; padding-right: 15px;}
+    .detail .lines{ text-align:left; color:var(--muted); font-size:24px; line-height:1.9; opacity:0.95; }
+
+    /* Next button: hidden by default, shown when panel hovered (image2) */
+    .next-wrap{ display:flex; justify-content:center; width:100%; margin-top:50px; }
+
+    .btn-next{
+      background:#FF0055;
+      box-shadow:0 6px 10px rgba(255,81,81,0.35);
+      opacity:0;
+      transform:translateY(20px);
+      animation:fadeUp 0.6s forwards;
+      font-family:Raleway;
+      border:none;
+      padding:16px 110px;
+      font-size:28px;
+      font-weight:600;
+      border-radius:14px;
+      cursor:pointer;
+      transition:all .7s ease;
+      color:#fff;
+    }
+    /* show only when hovered (or focus within) */
+    .panel:hover ~ .next-wrap .btn-next,
+    .panel:focus-within ~ .next-wrap .btn-next,
+    .panel:hover + .next-wrap .btn-next,
+    .panel:focus-within + .next-wrap .btn-next { transform:translateY(0); opacity:1; }
+
+    .ace{
+      position:fixed;
+      bottom:30px;
+      right:30px;
+      width:100px;
+      opacity:0.3;
+      transition:opacity .6s, filter .6s;
+      pointer-events:none;
+    }
+    .ace.glow{
+      opacity:1;
+      filter:drop-shadow(0 0 12px #FF0055) drop-shadow(0 0 28px #FF0055);
+    }
+    @media (max-width:860px){
+      .panel{ padding:30px 22px }
+      .choice{ min-width:160px; height:64px; font-size:18px }
+      .btn-next{ padding:10px 56px; font-size:18px }
+      .detail .bigtext{ font-size:20px }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="icon left-top">&#9829;</div> <!-- Club -->
+    <div class="icon right-top">&#9830;</div> <!-- Spade -->
+
+    <h1 class="title">CHALLENGE #4</h1>
+
+    <!-- panel: default shows .summary (image 1). Hover/Focus shows .detail (image 2) -->
+    <div class="panel" tabindex="0" aria-label="Challenge panel">
+      <div class="panel-inner">
+        <!-- SUMMARY (image 1) -->
+        <div class="summary" aria-hidden="false">
+          <h2>Em chọn đổi sang nhánh:</h2>
+          <div class="choices">
+            <div class="choice" id="branch1">Nhánh #1</div>
+            <div class="choice" id="branch2">Nhánh #2</div>
+          </div>
+          <div class="note">Nếu sai, công sức em từ đầu tới giờ coi như bỏ<br> Nếu đúng, em được tiếp tục</div>
+        </div>
+
+        <!-- DETAIL (image 2) shown on hover -->
+        <div class="detail" aria-hidden="true">
+          <div class="bigtext">Giả sử có một đoàn tàu chạy vào một đường ray có 2 nhánh:</div>
+          <div class="lines">
+            <p><strong>Nhánh #1:</strong> Anh đang bị trói vào đường ray</p>
+            <p><strong>Nhánh #2:</strong> Hoàng và 2 tội phạm đang bị trói vào đường ray</p>
+            <p style="margin-top:40px; font-style:italic; font-size: 22px; text-align: center;">Em chỉ có thể chuyển nhánh đoàn tàu sang nhánh 1 hoặc nhánh 2. Biết rằng đoàn tàu chạy liên tục, không thể dừng</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="next-wrap">
+      <button class="btn-next" id="nextBtn" aria-hidden="true">Next</button>
+    </div>
+
+    <img src="assets/heart.png" class="ace" alt="ace" id="aceCard">
+  </div>
+
+    <script>
+    const b1 = document.getElementById('branch1');
+    const b2 = document.getElementById('branch2');
+    const next = document.getElementById('nextBtn');
+    const aceCard = document.getElementById('aceCard');
+
+    function clearSelected(){
+        [b1,b2].forEach(x => { 
+        x.style.boxShadow=''; 
+        x.classList.remove('selected'); 
+        });
+        next.removeAttribute('data-choice');
+    }
+
+    function select(el){
+        clearSelected();
+        el.style.boxShadow = '0 24px 80px rgba(255,20,100,0.14), 0 0 28px rgba(255,80,140,0.06)';
+        el.classList.add('selected');
+        next.dataset.choice = el.id;
+
+        // Hiện nút Next ngay sau khi chọn
+        next.classList.add('next');
+        next.textContent = "Next";
+        next.style.opacity = '1';
+        next.style.transform = 'translateY(0)';
+        next.setAttribute('aria-hidden','false');
+    }
+
+    // gán sự kiện click
+    b1.addEventListener('click', ()=> select(b1));
+    b2.addEventListener('click', ()=> select(b2));
+
+    next.addEventListener('click', ()=>{
+        const choice = next.dataset.choice;
+
+        if(choice === 'branch1'){
+        alert(" Anh nghĩ, em vì thương anh nên mới chọn nhánh này.\n Mặc dù không đúng, kệ nó, anh yêu em nhiều lắm!");
+        window.location.href = "endingxcongrats.html";
+        }
+        else if(choice === 'branch2'){
+        // Ace sáng lên trước
+        aceCard.classList.add('glow');
+        setTimeout(()=>{
+            window.location.href = "endingxcongrats.html";
+        }, 1800); // chờ 1.2s để thấy hiệu ứng
+        }
+    });
+
+    // accessibility bằng phím
+    [b1,b2].forEach(c=>{
+        c.setAttribute('tabindex','0');
+        c.addEventListener('keydown', e=>{
+        if(e.key === 'Enter' || e.key === ' ') { select(c); e.preventDefault(); }
+        });
+    });
+
+    // ẩn Next ban đầu
+    next.style.opacity = '0';
+    next.style.transform = 'translateY(14px)';
+    next.setAttribute('aria-hidden','true');
+    </script>
+  <script>
+  // Chặn chuột phải
+  document.addEventListener("contextmenu", function(e){
+    e.preventDefault();
+  });
+
+  // Chặn F12, Ctrl+Shift+I, Ctrl+U
+  document.addEventListener("keydown", function(e){
+    // F12
+    if (e.key === "F12") {
+      e.preventDefault();
+    }
+    // Ctrl+Shift+I
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") {
+      e.preventDefault();
+    }
+    // Ctrl+U
+    if (e.ctrlKey && e.key.toLowerCase() === "u") {
+      e.preventDefault();
+    }
+  });
+</script>
+</body>
+</html>

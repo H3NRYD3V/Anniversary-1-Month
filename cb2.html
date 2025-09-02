@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Challenge #2</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0D0D0D;
+      --card: #1A1A1A;
+      --pink-title: #FF4D88;
+      --pink-text: #F2B6C1;
+      --locked-button: #F2B6C1;
+      --pink-button: #FF0055;
+      --accent: #FF4D88;
+      --error: #FF1E56;
+      --input-bg: #212121;
+    }
+
+    * { box-sizing: border-box }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      font-family: "Raleway", system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--pink-text);
+    }
+
+    .stage {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 80px 20px 80px;
+      position: relative;
+    }
+
+    .icon {
+      position: absolute;
+      font-size: 120px;
+      color: #ff3737;
+      opacity: 0.9;
+    }
+    .icon.left-top { top: 50px; left: 50px; }
+    .icon.right-top { top: 50px; right: 50px; }
+
+    h1.title {
+      font-family: "Cinzel Decorative", serif;
+      font-size: 70px;
+      color: var(--pink-title);
+      text-shadow: 13px 10px 4px rgba(255,30,86,0.25);
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+
+    .board {
+      width: 1100px;
+      max-width: 94%;
+      height: 600px;
+      position: relative;
+      margin-top: 10px;
+    }
+
+    .card {
+      width: 380px;
+      height: 100px;
+      background: var(--card);
+      border-radius: 12px;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      text-align: center;
+      color: var(--pink-text);
+      font-weight: 600;
+      font-size: 25px;
+      line-height: 1.3;
+      z-index: 1;
+      box-shadow: 0 16px 70px rgba(83,83,83,0.25);
+      transition: transform .14s ease, box-shadow .14s ease, background .14s ease;
+      overflow: hidden;
+    }
+
+    .card p { margin: 0; padding: 0 }
+    .card input {
+      display: none;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      background: var(--input-bg);
+      color: var(--pink-text);
+      font-size: 24px;
+      text-align: left;
+      outline: none;
+      position: relative;
+      z-index: 2;
+      font-family: Raleway, sans-serif;
+      font-weight: 700;
+    }
+
+    .card:hover { transform: translateY(-6px); background: #242424; box-shadow: 0 6px 10px rgba(255,81,81,0.35); }
+    .card:hover p { display: none }
+    .card:hover input { display: block }
+
+    #c1 { left: 60px; top: 48px; }
+    #c2 { right: 60px; top: 48px; }
+    #c3 { left: calc(50% - 190px); top: 220px; }
+    #c4 { left: 60px; bottom: 110px; }
+    #c5 { right: 60px; bottom: 110px; }
+
+    .card.correct { background: #1f1f1f; }
+    .card.wrong { animation: shake .36s; }
+
+    @keyframes shake {
+      0%   { transform: translateX(0) }
+      20%  { transform: translateX(-6px) }
+      40%  { transform: translateX(6px) }
+      60%  { transform: translateX(-4px) }
+      80%  { transform: translateX(4px) }
+      100% { transform: translateX(0) }
+    }
+
+    .card.glow { animation: glowPulse 1s ease forwards; }
+    @keyframes glowPulse {
+      0%   { box-shadow:0 0 0 2px var(--accent),0 0 28px rgba(255,77,136,0.35),0 16px 70px rgba(83,83,83,0.25); }
+      50%  { box-shadow:0 0 20px 4px var(--accent),0 0 60px rgba(255,77,136,0.65),0 16px 70px rgba(83,83,83,0.25); }
+      100% { box-shadow:0 0 0 2px var(--accent),0 0 28px rgba(255,77,136,0.35),0 16px 70px rgba(83,83,83,0.25); }
+    }
+
+    .controls { width: 100%; display: flex; justify-content: center; margin-top: 0px; }
+    .btn {
+      font-family: "Raleway", sans-serif;
+      border: none;
+      padding: 16px 110px;
+      font-size: 28px;
+      font-weight: 600;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+    }
+    .btn.locked { background: var(--locked-button); cursor: not-allowed; opacity: .8; color: #fff; }
+    .btn.next { background: var(--pink-button); color: #fff; box-shadow: 0 6px 10px rgba(255,81,81,0.35); cursor: pointer; }
+    .btn:active { transform: translateY(2px) scale(.995); }
+    .btn:hover:not(.locked) { transform: translateY(-3px); box-shadow: 0 6px 10px rgba(255,81,81,0.35); }
+
+    /* spade image góc dưới */
+    .spade {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 100px;
+      opacity: 0.3;
+      transition: opacity 0.6s, filter 0.6s, transform 0.6s;
+      pointer-events: none;
+    }
+    .spade.glow {
+      opacity: 1;
+      filter: drop-shadow(0 0 12px var(--accent)) drop-shadow(0 0 28px var(--accent));
+    }
+
+    @media (max-width:860px) {
+      #c1 { left:24px; top:36px }
+      #c2 { right:24px; top:36px }
+      #c3 { left: calc(50% - 190px); top:160px }
+      #c4 { left:36px; bottom:90px }
+      #c5 { right:36px; bottom:90px }
+    }
+
+    .card.locked {
+      cursor: default;
+      pointer-events: none; /* disable further hover/click on this card */
+      opacity: 0.98;
+      box-shadow: 0 18px 60px rgba(83,83,83,0.18), 0 0 28px rgba(255,77,136,0.04);
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="icon left-top">&#9829;</div> <!-- Club -->
+    <div class="icon right-top">&#9830;</div> <!-- Spade -->
+
+    <h1 class="title">CHALLENGE #2</h1>
+
+    <div class="board" id="board">
+      <div class="card" id="c1" data-key="a1">
+        <p>Anh tỏ tình em vào lúc mấy giờ?</p>
+        <input type="text" placeholder="Answer..." data-key="a1">
+      </div>
+      <div class="card" id="c2" data-key="a2">
+        <p>Nhà anh cách nhà em bao nhiêu km?</p>
+        <input type="text" placeholder="Answer..." data-key="a2">
+      </div>
+      <div class="card" id="c3" data-key="a3">
+        <p>Buổi call đầu tiên kéo dài bao lâu?</p>
+        <input type="text" placeholder="Answer..." data-key="a3">
+      </div>
+      <div class="card" id="c4" data-key="a4">
+        <p>Anh đã học ảo thuật được mấy tháng?</p>
+        <input type="text" placeholder="Answer..." data-key="a4">
+      </div>
+      <div class="card" id="c5" data-key="a5">
+        <p>Anh cao 1m bao nhiêu?</p>
+        <input type="text" placeholder="Answer..." data-key="a5">
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="lockBtn" class="btn locked">Locked</button>
+    </div>
+  </div>
+
+  <!-- ảnh lá bài -->
+  <img src="assets/clubs.png" alt="Spade" class="spade" id="spade">
+
+  <script>
+    const answers = {
+      a1: ['7g47','7g48','7g49','7g44'],
+      a2: ['400','399','398','400km','399km','398km'],
+      a3: ['1g47p','1:47','1h47m','1h47','1 giờ 47 phút','1 giờ 47','1h47'],
+      a4: ['2 tháng','2tháng','2'],
+      a5: ['65','65cm','65 cm']
+    };
+
+    const cards   = Array.from(document.querySelectorAll('.card'));
+    const inputs  = cards.map(c => c.querySelector('input'));
+    const lockBtn = document.getElementById('lockBtn');
+    const spade   = document.getElementById('spade');
+
+    function normalize(s) {
+      return (s||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
+    }
+    function isCorrect(key,value) {
+      const v = normalize(value);
+      const target = answers[key];
+      if (!target) return false;
+      for (const t of target) if (normalize(t)===v) return true;
+      const digits=v.replace(/[^\d]/g,'');
+      if (digits.length>0) {
+        for (const t of target) {
+          const td=t.replace(/[^\d]/g,'');
+          if (td&&td===digits) return true;
+        }
+      }
+      return false;
+    }
+
+    function setState(cardEl, ok) {
+      // clear transient classes first
+      cardEl.classList.remove('wrong','correct','glow','locked');
+      const inp = cardEl.querySelector('input');
+      if (ok) {
+        // mark correct and lock this card (no more hover / edits)
+        cardEl.classList.add('correct','glow','locked');
+        if (inp) {
+          inp.readOnly = true;
+          inp.blur();
+        }
+        // keep glow briefly then update global state
+        setTimeout(()=> {
+          cardEl.classList.remove('glow');
+          updateLock();
+        }, 1000);
+      } else {
+        cardEl.classList.add('wrong');
+        if (inp) inp.readOnly = false;
+        setTimeout(()=> cardEl.classList.remove('wrong'),380);
+      }
+    }
+
+    function updateLock() {
+      const ok = cards.every(card=>card.classList.contains('correct'));
+      if (ok) {
+        spade.classList.add('glow'); // lá bài sáng trước
+        setTimeout(()=>{
+          lockBtn.textContent = 'Next';
+          lockBtn.classList.remove('locked');
+          lockBtn.classList.add('next');
+          lockBtn.onclick = () => window.location.href = "yn3.html";;
+        },1000);
+      } else {
+        lockBtn.textContent = 'Locked';
+        lockBtn.classList.remove('next');
+        lockBtn.classList.add('locked');
+        lockBtn.onclick = null;
+        spade.classList.remove('glow');
+      }
+    }
+
+    inputs.forEach(inp=>{
+      inp.addEventListener('keydown',e=>{
+        if (e.key==='Enter') {
+          const key=inp.dataset.key;
+          const card=inp.closest('.card');
+          const ok=isCorrect(key,inp.value);
+          setState(card,ok);
+        }
+      });
+      inp.addEventListener('input',()=>{
+        const card=inp.closest('.card');
+        card.classList.remove('wrong','correct');
+      });
+    });
+
+    cards.forEach(card=>{
+      card.addEventListener('mouseenter',()=>{
+        const inp=card.querySelector('input');
+        setTimeout(()=>inp.focus(),120);
+      });
+    });
+
+    updateLock();
+  </script>
+  <script>
+  // Chặn chuột phải
+  document.addEventListener("contextmenu", function(e){
+    e.preventDefault();
+  });
+
+  // Chặn F12, Ctrl+Shift+I, Ctrl+U
+  document.addEventListener("keydown", function(e){
+    // F12
+    if (e.key === "F12") {
+      e.preventDefault();
+    }
+    // Ctrl+Shift+I
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") {
+      e.preventDefault();
+    }
+    // Ctrl+U
+    if (e.ctrlKey && e.key.toLowerCase() === "u") {
+      e.preventDefault();
+    }
+  });
+  </script>
+</body>
+</html>

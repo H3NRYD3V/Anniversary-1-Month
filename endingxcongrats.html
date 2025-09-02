@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Outro — Congratulations</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Raleway:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0d0d0d;
+      --pink:#ff4d88;
+      --muted:#f2cfcf;
+      --card-w:170px;
+      --card-h:240px;
+      --glow:#ff4d88;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);font-family:Raleway,system-ui,Segoe UI,Roboto,Arial;color:var(--muted)}
+    .stage{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:44px;padding:48px 20px;position:relative}
+
+    h1.title{
+    font-family:"Cinzel Decorative",serif;
+    font-size:86px;
+    margin:0;
+    color:var(--pink);
+    letter-spacing:2px;
+    text-shadow:13px 10px 4px rgba(255,30,86,0.25);
+    }
+
+
+    .cards{
+      display:flex;
+      gap:30px;
+      align-items:flex-end;
+      justify-content:center;
+      padding:28px;
+      position:relative;
+    }
+
+    .card{
+      width:var(--card-w);
+      height:var(--card-h);
+      background:#fff;
+      border-radius:8px;
+      display:block;
+      overflow:hidden;
+      opacity:0.2;
+      transform: scale(.96);
+      box-shadow:0 12px 40px rgba(0,0,0,0.6);
+    }
+
+    .card img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    /* hiệu ứng fade sáng dần */
+    @keyframes fadeGlow {
+      0% { opacity:0.2; transform:scale(.96); box-shadow:0 12px 40px rgba(0,0,0,0.6); }
+      100% { opacity:1; transform:scale(1); box-shadow:0 16px 60px rgba(0,0,0,0.6), 0 0 20px rgba(255,77,136,0.4), 0 0 40px rgba(255,77,136,0.2); }
+    }
+
+    .card.glow { animation: fadeGlow 1.2s ease forwards; }
+
+    /* glow nền lớn mờ phía sau */
+    .cards::before{
+      content:'';
+      position:absolute;
+      width:70%;
+      height:280px;
+      background:radial-gradient(closest-side, rgba(255,80,140,0.08), transparent 60%);
+      filter: blur(50px);
+      z-index:0;
+      pointer-events:none;
+    }
+
+    /* download button */
+    .download-wrap{ margin-top:8px; display:flex; justify-content:center; width:100% }
+    .download{
+      display:inline-block;
+      background:#1f1f1f;
+      color:var(--muted);
+      padding:18px 18px;
+      border-radius:12px;
+      text-decoration:none;
+      font-weight:600;
+      box-shadow:0 18px 60px rgba(0,0,0,0.6),0 0 30px rgba(255,80,140,0.06);
+      transition:transform .16s ease, box-shadow .16s ease;
+    }
+    .download:hover{
+      transform:translateY(-6px);
+      box-shadow:0 30px 90px rgba(255,80,140,0.12);
+    }
+    .download .name{ background:rgba(255,255,255,0.02); padding:20px 70px; border-radius:8px; display:inline-block; font-size: 24px; }
+
+    @media (max-width:860px){
+      .cards{ gap:18px; }
+      :root{ --card-w:130px; --card-h:190px; }
+      h1.title{ font-size:52px }
+    }
+  </style>
+</head>
+<body>
+  <div class="stage" role="main" aria-labelledby="title">
+    <h1 id="title" class="title">CONGRATULATIONS</h1>
+
+    <div class="cards" aria-hidden="false">
+      <a class="card c1"><img src="assets/bigspade.png" alt="ace of spades"></a>
+      <a class="card c2"><img src="assets/bigclubs.png" alt="ace of clubs"></a>
+      <a class="card c3"><img src="assets/bigdiamond.png" alt="ace of diamonds"></a>
+      <a class="card c4"><img src="assets/bigheart.png" alt="ace of hearts"></a>
+    </div>
+
+    <div class="download-wrap">
+      <a class="download" href="assets/letter.txt" download>
+        <span class="name">letter.txt</span>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    // lần lượt sáng dần từ ♠ -> ♣ -> ♦ -> ♥
+    window.addEventListener("load", ()=>{
+      const cards = document.querySelectorAll('.card');
+      cards.forEach((c, i) => {
+        setTimeout(()=> c.classList.add('glow'), i * 800); // delay theo thứ tự
+      });
+    });
+  </script>
+  <script>
+  // Chặn chuột phải
+  document.addEventListener("contextmenu", function(e){
+    e.preventDefault();
+  });
+
+  // Chặn F12, Ctrl+Shift+I, Ctrl+U
+  document.addEventListener("keydown", function(e){
+    // F12
+    if (e.key === "F12") {
+      e.preventDefault();
+    }
+    // Ctrl+Shift+I
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") {
+      e.preventDefault();
+    }
+    // Ctrl+U
+    if (e.ctrlKey && e.key.toLowerCase() === "u") {
+      e.preventDefault();
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Challenge #3</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0d0d0d;
+      --card:#1A1A1A;
+      --pink-title:#ff4d88;
+      --pink-text:#f2cfd6;
+      --locked-button:#F2B6C1;
+      --pink-button:#FF0055;
+      --accent:#2b2b2b;
+      --error:#FF1E56;
+      --input-bg:#212121;
+      --success:#00ff99;
+    }
+
+    *{box-sizing:border-box}
+    html,body{
+      height:100%;
+      margin:0;
+      background:var(--bg);
+      font-family:"Raleway",sans-serif;
+      color:var(--pink-text);
+    }
+
+    .stage{
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:80px 20px 80px;
+      position:relative;
+    }
+
+    h1.title{
+      font-family:"Cinzel Decorative",serif;
+      font-size:70px;
+      color:var(--pink-title);
+      text-shadow:13px 10px 4px rgba(255,30,86,0.25);
+      margin:0 0 30px;
+    }
+
+    .row{ display:flex; gap:40px; flex-wrap:wrap; justify-content:center; margin-top: 40px;}
+
+    .polaroid{
+      width:300px;
+      background:var(--card);
+      border-radius:12px;
+      padding:14px;
+      box-shadow:0 16px 70px rgba(83,83,83,0.25);
+      transition:transform .2s ease, box-shadow .2s ease;
+      position:relative;
+    }
+    .polaroid:hover{ transform:translateY(-6px); box-shadow:0 6px 10px rgba(255,81,81,0.35); }
+
+    .photo-wrap{ 
+      background:#111; border-radius:8px; overflow:hidden; height:300px;
+      position:relative;
+    }
+    .photo-wrap img{ width:100%; height:100%; object-fit:cover; }
+
+    /* nút download overlay (hiện khi hover) */
+    .download-btn{
+      position:absolute;
+      bottom:10px; right:10px;
+      background:var(--accent);
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      padding:6px 12px;
+      font-size:14px;
+      cursor:pointer;
+      opacity:0;
+      transform:translateY(6px);
+      transition:all .3s ease;
+      font-family: Raleway, sans-serif;
+    }
+    .photo-wrap:hover .download-btn{
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    .caption{ text-align:center; margin-top:12px; font-size:24px; font-weight:600; font-family: Raleway, sans-serif;}
+
+    .overlay{ margin-top:12px; display:flex; justify-content:center; }
+    .overlay input{
+      width:80%;
+      background:var(--input-bg);
+      color:var(--pink-text);
+      outline:none;
+      padding:10px 16px;
+      border:none;
+      border-radius:8px;
+      font-size:22px;
+      text-align:left;
+      font-family: Raleway, sans-serif;
+      font-weight: 700;
+      transition: all 0.3s ease;
+    }
+
+    /* animation */
+    @keyframes shake {
+      0%,100% { transform:translateX(0); }
+      25% { transform:translateX(-6px); }
+      75% { transform:translateX(6px); }
+    }
+    @keyframes flashBorder {
+        0% { box-shadow:0 0 0 #aaa; border-color:transparent; }
+        50% { box-shadow:0 0 14px #ddd,0 0 28px #ddd; border-color:#ddd; }
+        100% { box-shadow:none; border-color:transparent; }
+        }
+
+
+    .correct{
+      border:2px solid transparent;
+      animation:flashBorder 0.8s ease;
+    }
+    .wrong{ 
+      border:2px solid var(--error);
+      animation:shake .4s ease; 
+    }
+
+    /* controls */
+    .controls{ margin-top:80px; display:flex; justify-content:center; width:100% }
+    .btn{
+      font-family:Raleway;
+      border:none;
+      padding:16px 110px;
+      font-size:28px;
+      font-weight:600;
+      border-radius:14px;
+      cursor:pointer;
+      transition:all .2s ease;
+      color:#fff;
+    }
+    .btn.locked{
+      background:var(--locked-button);
+      cursor:not-allowed;
+      opacity:.8;
+    }
+    .btn.next{
+      background:var(--pink-button);
+      box-shadow:0 6px 10px rgba(255,81,81,0.35);
+      opacity:0;
+      transform:translateY(20px);
+      animation:fadeUp 0.6s forwards;
+    }
+    @keyframes fadeUp {
+      to {
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+
+    /* ace card */
+    .ace{
+      position:fixed;
+      bottom:30px;
+      right:30px;
+      width:100px;
+      opacity:0.3;
+      transition:opacity .6s, filter .6s;
+      pointer-events:none;
+    }
+    .ace.glow{
+      opacity:1;
+      filter:drop-shadow(0 0 12px var(--pink-button)) drop-shadow(0 0 28px var(--pink-button));
+    }
+    .icon {
+      position: absolute;
+      font-size: 120px;
+      color: #414141;
+      opacity: 0.9;
+    }
+    .icon.left-top { top: 50px; left: 50px; }
+    .icon.right-top { top: 50px; right: 50px; }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="icon left-top">&#x2663;</div> <!-- Club -->
+    <div class="icon right-top">&#x2660;</div> <!-- Spade -->
+    <h1 class="title">CHALLENGE #3</h1>
+
+    <div class="row">
+      <div class="polaroid" data-answer="7252">
+        <div class="photo-wrap">
+          <img src="assets/1.jpg" alt="Anh">
+          <button class="download-btn" onclick="downloadImage('assets/1.jpg')">Download</button>
+        </div>
+        <div class="caption">Anh</div>
+        <div class="overlay"><input type="text" placeholder="4-Digit Code..."></div>
+      </div>
+
+      <div class="polaroid" data-answer="2112">
+        <div class="photo-wrap">
+          <img src="assets/2.jpg" alt="Street">
+          <button class="download-btn" onclick="downloadImage('assets/2.jpg')">Download</button>
+        </div>
+        <div class="caption">Street</div>
+        <div class="overlay"><input type="text" placeholder="4-Digit Code..."></div>
+      </div>
+
+      <div class="polaroid" data-answer="1412">
+        <div class="photo-wrap">
+          <img src="assets/3.jpg" alt="Squeeze">
+          <button class="download-btn" onclick="downloadImage('assets/3.jpg')">Download</button>
+        </div>
+        <div class="caption">Squeeze</div>
+        <div class="overlay"><input type="text" placeholder="4-Digit Code..."></div>
+      </div>
+
+      <div class="polaroid" data-answer="8386">
+        <div class="photo-wrap">
+          <img src="assets/4.jpg" alt="Beach">
+          <button class="download-btn" onclick="downloadImage('assets/4.jpg')">Download</button>
+        </div>
+        <div class="caption">Beach</div>
+        <div class="overlay"><input type="text" placeholder="4-Digit Code..."></div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="actionBtn" class="btn locked">Locked</button>
+    </div>
+    <img src="assets/diamond.png" id="aceCard" class="ace" alt="ace">
+  </div>
+
+  <script>
+    const aceCard = document.getElementById('aceCard');
+    const actionBtn = document.getElementById('actionBtn');
+    const inputs = document.querySelectorAll('.polaroid input');
+    const total = inputs.length;
+    let correctCount = 0;
+
+    function downloadImage(path){
+      const link = document.createElement('a');
+      link.href = path;
+      link.download = path.split('/').pop();
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function unlockNext(){
+      if(correctCount === total){
+        aceCard.classList.add('glow');
+        setTimeout(()=>{
+          actionBtn.classList.remove('locked');
+          actionBtn.classList.add('next');
+          actionBtn.textContent = "Next";
+          actionBtn.onclick = ()=>window.location.href="bc4.html";
+        }, 800);
+      }
+    }
+
+    inputs.forEach(input=>{
+      input.addEventListener("keypress", e=>{
+        if(e.key==="Enter"){
+          const polaroid=input.closest('.polaroid');
+          const answer=polaroid.dataset.answer.toLowerCase();
+          if(input.value.trim().toLowerCase()===answer){
+            input.classList.remove("wrong");
+            input.classList.add("correct");
+            input.disabled=true;
+            correctCount++;
+            unlockNext();
+          }else{
+            input.classList.remove("correct");
+            input.classList.add("wrong");
+            setTimeout(()=>input.classList.remove("wrong"),500);
+          }
+        }
+      });
+    });
+  </script>
+  <script>
+  // Chặn chuột phải
+  document.addEventListener("contextmenu", function(e){
+    e.preventDefault();
+  });
+
+  // Chặn F12, Ctrl+Shift+I, Ctrl+U
+  document.addEventListener("keydown", function(e){
+    // F12
+    if (e.key === "F12") {
+      e.preventDefault();
+    }
+    // Ctrl+Shift+I
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "i") {
+      e.preventDefault();
+    }
+    // Ctrl+U
+    if (e.ctrlKey && e.key.toLowerCase() === "u") {
+      e.preventDefault();
+    }
+  });
+</script>
+</body>
+</html>
