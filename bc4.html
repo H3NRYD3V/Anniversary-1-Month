@@ -255,11 +255,11 @@
     next.addEventListener('click', ()=>{
         const choice = next.dataset.choice;
 
-        if(choice === 'branch1'){
+        if(choice === 'branch2'){
         alert(" Anh nghĩ, em vì thương anh nên mới chọn nhánh này.\n Mặc dù không đúng, kệ nó, anh yêu em nhiều lắm!");
         window.location.href = "endingxcongrats.html";
         }
-        else if(choice === 'branch2'){
+        else if(choice === 'branch1'){
         // Ace sáng lên trước
         aceCard.classList.add('glow');
         setTimeout(()=>{
@@ -304,4 +304,5 @@
   });
 </script>
 </body>
+
 </html>
